@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="ListaMercado — organize compras e descubra receitas brasileiras do seu jeito.">
+  <meta name="theme-color" content="#2d6a4f">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>ListaMercado — Compras e Receitas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar__brand">
+        <span class="topbar__logo" aria-hidden="true">🛒</span>
+        <div>
+          <h1>ListaMercado</h1>
+          <p class="muted" id="appSubtitle">Suas compras, por corredor</p>
+        </div>
+      </div>
+      <div class="topbar__stats" id="stats" hidden>
+        <span id="statTotal">0 itens</span>
+        <span class="dot">·</span>
+        <span id="statDone">0 marcados</span>
+      </div>
+    </header>
+
+    <nav class="nav-tabs" aria-label="Menu principal">
+      <button type="button" class="nav-tab nav-tab--active" data-tab="lista">🛒 Lista</button>
+      <button type="button" class="nav-tab" data-tab="receitas">🍳 Receitas</button>
+      <button type="button" class="nav-tab" data-tab="perfil">👤 Perfil</button>
+    </nav>
+
+    <!-- ═══ LISTA DE COMPRAS ═══ -->
+    <div id="view-lista">
+      <section class="panel panel--lists card reveal">
+        <div class="panel__head">
+          <label class="label" for="listSelect">Lista ativa</label>
+          <div class="list-controls">
+            <select id="listSelect" class="select" aria-label="Selecionar lista"></select>
+            <button type="button" class="btn btn--outline btn--icon" id="btnNewList" title="Nova lista">+</button>
+            <button type="button" class="btn btn--ghost btn--icon btn--danger" id="btnDeleteList" title="Excluir lista">🗑</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel card reveal">
+        <label class="label" for="inputItems">O que comprar?</label>
+        <p class="hint">Cole ou digite — um item por linha ou separados por vírgula.</p>
+        <textarea id="inputItems" class="textarea" rows="5"
+          placeholder="carne de boi&#10;uva&#10;cenoura&#10;biscoito&#10;2 batatas&#10;shampoo"></textarea>
+        <div class="panel__actions">
+          <button type="button" class="btn btn--primary btn--shine" id="btnGenerate">Gerar lista</button>
+          <button type="button" class="btn btn--outline" id="btnClearInput">Limpar texto</button>
+        </div>
+      </section>
+
+      <section class="panel card reveal" id="listSection" hidden>
+        <div class="panel__head panel__head--between">
+          <h2 class="panel__title">Lista organizada</h2>
+          <div class="panel__actions panel__actions--inline">
+            <button type="button" class="btn btn--ghost btn--sm" id="btnUncheckAll">Desmarcar tudo</button>
+            <button type="button" class="btn btn--ghost btn--sm btn--danger" id="btnClearChecked">Remover marcados</button>
+          </div>
+        </div>
+        <div id="categoryList" class="category-list"></div>
+        <p id="emptyHint" class="empty" hidden>Nenhum item. Digite acima e clique em <strong>Gerar lista</strong>.</p>
+      </section>
+    </div>
+
+    <!-- ═══ RECEITAS ═══ -->
+    <div id="view-receitas" hidden>
+      <section class="card reveal profile-banner" id="profileBanner" hidden>
+        <p>🍽️ <strong>Configure seu perfil</strong> — região, estado e gostos — para receitas personalizadas.</p>
+        <button type="button" class="btn btn--primary btn--sm" id="btnGoProfile">Ir para o Perfil</button>
+      </section>
+
+      <section class="card reveal">
+        <h2 class="panel__title">O que vai comer?</h2>
+        <p class="hint">Escolha a refeição e receba sugestões baseadas no seu perfil regional.</p>
+        <div class="meal-buttons" id="mealButtons"></div>
+      </section>
+
+      <section class="card reveal" id="recipeSuggestions" hidden>
+        <div class="panel__head panel__head--between">
+          <h2 class="panel__title" id="suggestionsTitle">Sugestões</h2>
+          <button type="button" class="btn btn--outline btn--sm" id="btnRefreshRecipes">🔄 Gerar novas</button>
+        </div>
+        <div class="recipe-grid" id="suggestionCards"></div>
+      </section>
+
+      <section class="card reveal recipe-detail" id="recipeDetail" hidden>
+        <button type="button" class="btn btn--ghost btn--sm" id="btnBackSuggestions">← Voltar às sugestões</button>
+        <img id="detailImg" class="recipe-detail__img" src="" alt="" loading="eager" decoding="async">
+        <h2 id="detailTitle" class="recipe-detail__title"></h2>
+        <p id="detailOrigin" class="recipe-detail__origin"></p>
+        <p id="detailDesc" class="recipe-detail__desc"></p>
+        <h3 class="recipe-detail__sub">Modo de preparo</h3>
+        <ol id="detailSteps" class="recipe-steps"></ol>
+        <h3 class="recipe-detail__sub">Ingredientes para comprar</h3>
+        <ul id="detailShop" class="recipe-shop"></ul>
+        <button type="button" class="btn btn--primary btn--shine" id="btnAddDetailShop">Adicionar ingredientes à lista</button>
+      </section>
+    </div>
+
+    <!-- ═══ PERFIL ═══ -->
+    <div id="view-perfil" hidden>
+      <section class="card reveal">
+        <h2 class="panel__title">De onde você é?</h2>
+        <p class="hint">Isso ajuda a sugerir comidas da sua região — ex.: Sergipe, Nordeste.</p>
+        <label class="label" for="profileRegion">Região</label>
+        <select id="profileRegion" class="select"></select>
+        <label class="label" for="profileState" style="margin-top:12px">Estado</label>
+        <select id="profileState" class="select"></select>
+      </section>
+
+      <section class="card reveal" id="tasteSections">
+        <h2 class="panel__title">O que você gosta?</h2>
+        <p class="hint">Marque os alimentos que você curte em cada refeição.</p>
+
+        <div class="taste-block">
+          <h3>☀️ Café da manhã</h3>
+          <div class="chip-grid" id="tastes-cafe"></div>
+        </div>
+        <div class="taste-block">
+          <h3>🍽️ Almoço</h3>
+          <div class="chip-grid" id="tastes-almoco"></div>
+        </div>
+        <div class="taste-block">
+          <h3>🌙 Janta</h3>
+          <div class="chip-grid" id="tastes-janta"></div>
+        </div>
+
+        <button type="button" class="btn btn--primary btn--shine" id="btnSaveProfile" style="margin-top:16px;width:100%">
+          Salvar perfil
+        </button>
+      </section>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toasts" aria-live="polite"></div>
+
+  <dialog class="dialog" id="dialogNewList">
+    <form method="dialog" class="dialog__body" id="formNewList">
+      <h3>Nova lista</h3>
+      <label class="label" for="newListName">Nome</label>
+      <input type="text" id="newListName" class="input" placeholder="Compra sábado" required>
+      <div class="dialog__actions">
+        <button type="button" class="btn btn--outline" value="cancel">Cancelar</button>
+        <button type="submit" class="btn btn--primary" value="ok">Criar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="dictionary.js"></script>
+  <script src="profile-data.js"></script>
+  <script src="recipes-data.js"></script>
+  <script src="recipe-images.js"></script>
+  <script src="script.js"></script>
+  <script src="receitas.js"></script>
+</body>
+</html>

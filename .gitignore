@@ -1,0 +1,10 @@
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+*.pem
+*.key
+*.p12
+secrets/
+node_modules/
