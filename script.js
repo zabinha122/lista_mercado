@@ -270,7 +270,7 @@ function updateStats() {
   let totalPrice = 0;
 
   list.items.forEach((item) => {
-    if (!item.checked) {
+    if (!item.checked && !item.fromRecipe) {
       totalPrice += estimateItemPrice(item.text).price;
     }
   });
@@ -285,8 +285,13 @@ function updateStats() {
   els.statTotal.textContent = `${total} ${total === 1 ? "item" : "itens"}`;
   els.statDone.textContent = `${done} marcado${done !== 1 ? "s" : ""}`;
 
-  els.listTotals.hidden = false;
-  els.listTotalValue.textContent = formatBRL(totalPrice);
+  const hasPricedItems = list.items.some((i) => !i.fromRecipe && !i.checked);
+  if (hasPricedItems) {
+    els.listTotals.hidden = false;
+    els.listTotalValue.textContent = formatBRL(totalPrice);
+  } else {
+    els.listTotals.hidden = true;
+  }
 }
 
 function renderListSelect() {
@@ -358,12 +363,6 @@ function renderCategories() {
       text.className = "item-row__text";
       text.textContent = item.text;
 
-      const priceInfo = estimateItemPrice(item.text);
-      const price = document.createElement("span");
-      price.className = "item-row__price";
-      price.title = "Referência: " + priceInfo.unit;
-      price.textContent = "~" + formatBRL(priceInfo.price);
-
       const select = document.createElement("select");
       select.className = "select select--sm item-row__cat";
       select.setAttribute("aria-label", `Categoria de ${item.text}`);
@@ -381,7 +380,16 @@ function renderCategories() {
         toast("Categoria atualizada");
       });
 
-      li.append(check, text, price, select);
+      li.append(check, text);
+      if (!item.fromRecipe) {
+        const priceInfo = estimateItemPrice(item.text);
+        const price = document.createElement("span");
+        price.className = "item-row__price";
+        price.title = "Referência: " + priceInfo.unit;
+        price.textContent = "~" + formatBRL(priceInfo.price);
+        li.append(price);
+      }
+      li.append(select);
       ul.appendChild(li);
     });
 
@@ -594,6 +602,7 @@ window.ListaMercado = {
         text: text,
         category: categorize(text),
         checked: false,
+        fromRecipe: true,
       });
       existing[key] = true;
     });
