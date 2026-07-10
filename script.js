@@ -270,7 +270,7 @@ function updateStats() {
   let totalPrice = 0;
 
   list.items.forEach((item) => {
-    if (!item.checked && !item.fromRecipe) {
+    if (!item.fromRecipe) {
       totalPrice += estimateItemPrice(item.text).price;
     }
   });
