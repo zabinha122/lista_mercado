@@ -19,6 +19,9 @@ const els = {
   statDone: $("#statDone"),
   btnUncheckAll: $("#btnUncheckAll"),
   btnClearChecked: $("#btnClearChecked"),
+  btnClearList: $("#btnClearList"),
+  listTotals: $("#listTotals"),
+  listTotalValue: $("#listTotalValue"),
   dialogNewList: $("#dialogNewList"),
   formNewList: $("#formNewList"),
   newListName: $("#newListName"),
@@ -29,6 +32,63 @@ const els = {
 const SORTED_KEYWORDS = Object.entries(KEYWORDS).sort((a, b) => b[0].length - a[0].length);
 
 const categoryMap = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
+
+function formatBRL(value) {
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function parseItemQuantity(text) {
+  const trimmed = text.trim();
+  const match = trimmed.match(/^(\d+(?:[.,]\d+)?)\s*(kg|g|l|ml|un|und|unidade|unidades|dz|duzia|dúzia)?/i);
+  if (!match) return { qty: 1, unitHint: null };
+  const qty = parseFloat(match[1].replace(",", "."));
+  return { qty: qty > 0 ? qty : 1, unitHint: match[2] ? match[2].toLowerCase() : null };
+}
+
+function lookupPriceKeyword(text) {
+  if (typeof SORTED_PRICE_KEYWORDS === "undefined") return null;
+  const variants = matchVariants(text);
+  let best = null;
+  let bestLen = 0;
+
+  for (const normalized of variants) {
+    for (const [keyword, data] of SORTED_PRICE_KEYWORDS) {
+      const kw = stripAccents(keyword.toLowerCase());
+      if (normalized.includes(kw) && kw.length > bestLen) {
+        bestLen = kw.length;
+        best = { keyword, ...data };
+      }
+    }
+  }
+
+  return best;
+}
+
+function estimateItemPrice(text) {
+  const { qty } = parseItemQuantity(text);
+  const match = lookupPriceKeyword(text);
+  const category = categorize(text);
+
+  if (match) {
+    return {
+      price: Math.round(match.price * qty * 100) / 100,
+      unit: match.unit,
+      qty,
+      approx: true,
+    };
+  }
+
+  const base = (typeof CATEGORY_PRICES !== "undefined" && CATEGORY_PRICES[category])
+    ? CATEGORY_PRICES[category]
+    : 10.9;
+
+  return {
+    price: Math.round(base * qty * 100) / 100,
+    unit: "unidade ref.",
+    qty,
+    approx: true,
+  };
+}
 
 function uid() {
   return `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -207,15 +267,26 @@ function updateStats() {
   const list = activeList();
   const total = list.items.length;
   const done = list.items.filter((i) => i.checked).length;
+  let totalPrice = 0;
+
+  list.items.forEach((item) => {
+    if (!item.checked) {
+      totalPrice += estimateItemPrice(item.text).price;
+    }
+  });
 
   if (total === 0) {
     els.stats.hidden = true;
+    els.listTotals.hidden = true;
     return;
   }
 
   els.stats.hidden = false;
   els.statTotal.textContent = `${total} ${total === 1 ? "item" : "itens"}`;
   els.statDone.textContent = `${done} marcado${done !== 1 ? "s" : ""}`;
+
+  els.listTotals.hidden = false;
+  els.listTotalValue.textContent = formatBRL(totalPrice);
 }
 
 function renderListSelect() {
@@ -287,6 +358,12 @@ function renderCategories() {
       text.className = "item-row__text";
       text.textContent = item.text;
 
+      const priceInfo = estimateItemPrice(item.text);
+      const price = document.createElement("span");
+      price.className = "item-row__price";
+      price.title = "Referência: " + priceInfo.unit;
+      price.textContent = "~" + formatBRL(priceInfo.price);
+
       const select = document.createElement("select");
       select.className = "select select--sm item-row__cat";
       select.setAttribute("aria-label", `Categoria de ${item.text}`);
@@ -304,7 +381,7 @@ function renderCategories() {
         toast("Categoria atualizada");
       });
 
-      li.append(check, text, select);
+      li.append(check, text, price, select);
       ul.appendChild(li);
     });
 
@@ -444,6 +521,21 @@ els.btnClearChecked.addEventListener("click", () => {
   saveState();
   renderCategories();
   toast("Itens marcados removidos");
+});
+
+els.btnClearList.addEventListener("click", () => {
+  const list = activeList();
+  if (!list.items.length) {
+    toast("A lista já está vazia");
+    return;
+  }
+  if (!confirm("Limpar todos os itens da lista organizada?")) return;
+  list.items = [];
+  list.rawInput = "";
+  els.inputItems.value = "";
+  saveState();
+  renderCategories();
+  toast("Lista organizada limpa");
 });
 
 els.inputItems.addEventListener("blur", () => {

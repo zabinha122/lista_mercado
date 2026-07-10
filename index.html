@@ -66,9 +66,17 @@
           <div class="panel__actions panel__actions--inline">
             <button type="button" class="btn btn--ghost btn--sm" id="btnUncheckAll">Desmarcar tudo</button>
             <button type="button" class="btn btn--ghost btn--sm btn--danger" id="btnClearChecked">Remover marcados</button>
+            <button type="button" class="btn btn--ghost btn--sm btn--danger" id="btnClearList">Limpar lista</button>
           </div>
         </div>
         <div id="categoryList" class="category-list"></div>
+        <div class="list-totals" id="listTotals" hidden>
+          <div class="list-totals__row">
+            <span>Total estimado da lista</span>
+            <strong id="listTotalValue">R$ 0,00</strong>
+          </div>
+          <p class="hint list-totals__hint">Valores aproximados de referência (varejo BR). Podem variar por loja e região.</p>
+        </div>
         <p id="emptyHint" class="empty" hidden>Nenhum item. Digite acima e clique em <strong>Gerar lista</strong>.</p>
       </section>
     </div>
@@ -159,6 +167,7 @@
   </dialog>
 
   <script src="dictionary.js"></script>
+  <script src="prices-data.js"></script>
   <script src="profile-data.js"></script>
   <script src="recipes-data.js"></script>
   <script src="recipe-images.js"></script>

@@ -32,6 +32,16 @@ python3 -m http.server 8080
 
 Acesse `http://localhost:8080`.
 
+## Lista de compras com preços estimados
+
+Cada item exibe um valor aproximado (~R$) e a lista mostra o **total estimado**. Os preços vêm de referências do varejo brasileiro (Buscapé + tabela curada).
+
+Para atualizar preços:
+
+```bash
+python3 scripts/scrape_prices.py
+```
+
 ## Receitas (TudoGostoso)
 
 As receitas vêm do [TudoGostoso](https://www.tudogostoso.com.br), com imagens e ingredientes reais. Cada receita exibe o link da fonte.

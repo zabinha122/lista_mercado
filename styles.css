@@ -307,7 +307,43 @@ body {
   word-break: break-word;
 }
 
+.item-row__price {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: hsl(var(--primary));
+  white-space: nowrap;
+}
+
 .item-row__cat { flex-shrink: 0; }
+
+.list-totals {
+  margin-top: 1rem;
+  padding: 1rem 0.875rem;
+  border-top: 2px solid hsl(var(--primary) / 0.15);
+  background: hsl(var(--primary) / 0.06);
+  border-radius: var(--radius);
+}
+
+.list-totals__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9375rem;
+}
+
+.list-totals__row strong {
+  font-size: 1.25rem;
+  color: hsl(var(--primary));
+  font-family: var(--font-display);
+}
+
+.list-totals__hint {
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+  font-size: 0.75rem;
+}
 
 .empty {
   text-align: center;
