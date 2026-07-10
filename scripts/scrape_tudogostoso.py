@@ -15,11 +15,13 @@ from pathlib import Path
 USER_AGENT = "ListaMercado/1.0 (educational; github.com/zabinha122/lista_mercado)"
 BASE = "https://www.tudogostoso.com.br"
 DELAY_SEC = 0.6
-MAX_PER_QUERY = 2
+MAX_PER_QUERY = 3
 
 # termo de busca -> refeições sugeridas
 SEARCHES: list[tuple[str, list[str]]] = [
     ("cuscuz nordestino", ["cafe"]),
+    ("cuscuz com ovo sergipe", ["cafe"]),
+    ("cuscuz de milho", ["cafe"]),
     ("pão manteiga café", ["cafe"]),
     ("tapioca queijo", ["cafe", "janta"]),
     ("ovos mexidos", ["cafe"]),
@@ -54,6 +56,25 @@ SEARCHES: list[tuple[str, list[str]]] = [
     ("caldo verde", ["janta", "almoco"]),
     ("wrap frango", ["janta"]),
     ("pipoca", ["janta"]),
+    # Nordeste / Sergipe
+    ("baião de dois sergipe", ["almoco"]),
+    ("moqueca capixaba nordeste", ["almoco"]),
+    ("vatapá baiano", ["almoco"]),
+    ("acarajé baiano", ["almoco", "janta"]),
+    ("carne de sol nordestina", ["almoco"]),
+    ("galinha caipira nordeste", ["almoco"]),
+    ("sarapatel nordestino", ["almoco"]),
+    ("buchada de bode", ["almoco"]),
+    ("panelada sergipana", ["almoco"]),
+    ("arroz de siri", ["almoco"]),
+    ("pirão de peixe", ["almoco"]),
+    ("tapioca recheada nordeste", ["cafe", "janta"]),
+    ("bolo de fubá nordestino", ["cafe"]),
+    ("cocada baiana", ["cafe"]),
+    ("mungunzá", ["cafe"]),
+    ("canjica doce", ["cafe"]),
+    ("sopa de mocotó", ["janta", "almoco"]),
+    ("macaxeira frita", ["almoco", "janta"]),
 ]
 
 TASTE_KEYWORDS: dict[str, list[str]] = {

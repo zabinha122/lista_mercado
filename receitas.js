@@ -5,7 +5,15 @@ var PROFILE_KEY = "listamercado_profile_v1";
 var recipeEls = {};
 var selectedMeal = null;
 var selectedRecipe = null;
-var recentlyShown = { cafe: [], almoco: [], janta: [] };
+
+/** Por refeição: já exibidas e fila de rotação */
+var mealState = {
+  cafe: { recent: [], displayed: [] },
+  almoco: { recent: [], displayed: [] },
+  janta: { recent: [], displayed: [] },
+};
+
+var MEAL_STATE_KEY = "listamercado_meal_state_v1";
 
 var RECIPE_IMG_FALLBACK =
   "data:image/svg+xml," + encodeURIComponent(
@@ -44,6 +52,81 @@ function saveProfile(profile) {
 }
 
 var profile = loadProfile();
+loadMealState();
+
+function loadMealState() {
+  try {
+    var raw = sessionStorage.getItem(MEAL_STATE_KEY);
+    if (!raw) return;
+    var saved = JSON.parse(raw);
+    ["cafe", "almoco", "janta"].forEach(function (meal) {
+      if (saved[meal]) {
+        mealState[meal].recent = saved[meal].recent || [];
+        mealState[meal].displayed = saved[meal].displayed || [];
+      }
+    });
+  } catch (_) { /* ignore */ }
+}
+
+function saveMealState() {
+  try {
+    sessionStorage.setItem(MEAL_STATE_KEY, JSON.stringify(mealState));
+  } catch (_) { /* ignore */ }
+}
+
+function resetMealState() {
+  mealState = {
+    cafe: { recent: [], displayed: [] },
+    almoco: { recent: [], displayed: [] },
+    janta: { recent: [], displayed: [] },
+  };
+  saveMealState();
+}
+
+function recipesByIds(ids) {
+  return ids.map(function (id) {
+    return RECIPES.find(function (r) { return r.id === id; });
+  }).filter(Boolean);
+}
+
+function shuffleArray(arr) {
+  var copy = arr.slice();
+  for (var i = copy.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = copy[i];
+    copy[i] = copy[j];
+    copy[j] = tmp;
+  }
+  return copy;
+}
+
+/** Escolhe receitas com peso pelo score — mais variedade que sempre pegar o top 3 */
+function pickVaried(scoredPool, limit) {
+  if (scoredPool.length <= limit) return scoredPool.slice();
+
+  var available = scoredPool.slice();
+  var picked = [];
+
+  while (picked.length < limit && available.length) {
+    var weights = available.map(function (x) { return Math.max(x.score, 1); });
+    var total = weights.reduce(function (a, b) { return a + b; }, 0);
+    var r = Math.random() * total;
+    var idx = 0;
+
+    for (var i = 0; i < available.length; i++) {
+      r -= weights[i];
+      if (r <= 0) {
+        idx = i;
+        break;
+      }
+    }
+
+    picked.push(available[idx]);
+    available.splice(idx, 1);
+  }
+
+  return picked;
+}
 
 function normTag(s) {
   return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -125,13 +208,17 @@ function getScoredPool(meal) {
 
 function suggestRecipes(meal, limit, rotate) {
   limit = limit || 3;
+  var state = mealState[meal];
   var pool = getScoredPool(meal);
-  var recent = recentlyShown[meal] || [];
 
-  if (!rotate) {
-    recent = [];
+  if (!rotate && state.displayed.length) {
+    var cached = recipesByIds(state.displayed);
+    if (cached.length) return cached;
   }
 
+  if (!pool.length) return [];
+
+  var recent = state.recent.slice();
   var available = pool.filter(function (x) {
     return recent.indexOf(x.recipe.id) === -1;
   });
@@ -140,16 +227,31 @@ function suggestRecipes(meal, limit, rotate) {
     recent = [];
     available = pool.slice();
     if (rotate && pool.length > limit) {
-      showToast("Rodada completa — novas sugestões");
+      showToast("Rodada completa — voltando ao início do catálogo");
     }
   }
 
-  var picked = available.slice(0, limit).map(function (x) { return x.recipe; });
+  // Embaralha faixas de score parecido para não repetir sempre a mesma ordem
+  var tiers = {};
+  available.forEach(function (item) {
+    var key = String(item.score);
+    if (!tiers[key]) tiers[key] = [];
+    tiers[key].push(item);
+  });
+  available = [];
+  Object.keys(tiers).sort(function (a, b) { return Number(b) - Number(a); }).forEach(function (key) {
+    shuffleArray(tiers[key]).forEach(function (item) { available.push(item); });
+  });
+
+  var picked = pickVaried(available, limit).map(function (x) { return x.recipe; });
 
   picked.forEach(function (r) {
     recent.push(r.id);
   });
-  recentlyShown[meal] = recent;
+
+  state.recent = recent;
+  state.displayed = picked.map(function (r) { return r.id; });
+  saveMealState();
 
   return picked;
 }
@@ -255,6 +357,13 @@ function showSuggestions(mealId, rotate) {
   });
 
   if (rotate) showToast("Novas sugestões geradas");
+}
+
+function restoreMealSuggestionsIfAny() {
+  if (!selectedMeal || !profileComplete()) return;
+  var state = mealState[selectedMeal];
+  if (!state.displayed.length) return;
+  showSuggestions(selectedMeal, false);
 }
 
 function buildRecipeCard(recipe, compact) {
@@ -377,6 +486,7 @@ function renderReceitasView() {
     recipeEls.recipeDetail.hidden = true;
   } else {
     recipeEls.profileBanner.hidden = true;
+    restoreMealSuggestionsIfAny();
   }
 }
 
@@ -431,7 +541,8 @@ function initReceitas() {
     }
     profile.setupDone = true;
     saveProfile(profile);
-    recentlyShown = { cafe: [], almoco: [], janta: [] };
+    resetMealState();
+    selectedMeal = null;
     showToast("Perfil salvo! Agora explore as receitas.");
     switchTab("receitas");
   });
