@@ -407,11 +407,17 @@ function generateList() {
     return;
   }
 
-  const existing = new Map(list.items.map((i) => [i.text.toLowerCase(), i]));
+  const lineKeys = new Set(lines.map((l) => l.toLowerCase()));
+  const existingMap = new Map(list.items.map((i) => [i.text.toLowerCase(), i]));
+  const beforeCount = list.items.length;
 
+  list.items = list.items.filter((item) => lineKeys.has(item.text.toLowerCase()));
+  const removed = beforeCount - list.items.length;
+
+  let added = 0;
   lines.forEach((text) => {
     const key = text.toLowerCase();
-    if (existing.has(key)) return;
+    if (existingMap.has(key) && list.items.some((i) => i.text.toLowerCase() === key)) return;
 
     const item = {
       id: uid(),
@@ -420,13 +426,29 @@ function generateList() {
       checked: false,
     };
     list.items.push(item);
-    existing.set(key, item);
+    existingMap.set(key, item);
+    added += 1;
+  });
+
+  const orderMap = new Map(lines.map((line, index) => [line.toLowerCase(), index]));
+  list.items.sort((a, b) => {
+    const orderA = orderMap.get(a.text.toLowerCase()) ?? 999;
+    const orderB = orderMap.get(b.text.toLowerCase()) ?? 999;
+    return orderA - orderB;
   });
 
   saveState();
   renderCategories();
   els.listSection.hidden = false;
-  toast(`${lines.length} ${lines.length === 1 ? "item processado" : "itens processados"}`);
+
+  if (added || removed) {
+    const parts = [];
+    if (added) parts.push(`${added} adicionado${added !== 1 ? "s" : ""}`);
+    if (removed) parts.push(`${removed} removido${removed !== 1 ? "s" : ""}`);
+    toast(`Lista atualizada: ${parts.join(", ")}`);
+  } else {
+    toast("Lista já está em dia com o texto");
+  }
 }
 
 function migrateMiscategorized() {
