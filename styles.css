@@ -606,7 +606,23 @@ body {
 .recipe-detail__desc {
   font-size: 0.9375rem;
   color: hsl(var(--muted-fg));
+  margin-bottom: 0.5rem;
+}
+
+.recipe-detail__source {
+  font-size: 0.8125rem;
+  color: hsl(var(--muted-fg));
   margin-bottom: 1rem;
+}
+
+.recipe-detail__source a {
+  color: hsl(var(--primary));
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.recipe-detail__source a:hover {
+  text-decoration: underline;
 }
 
 .recipe-detail__sub {

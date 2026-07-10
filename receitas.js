@@ -49,6 +49,42 @@ function normTag(s) {
   return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
+function recipeText(recipe) {
+  var parts = [recipe.name || "", recipe.desc || ""];
+  (recipe.tags || []).forEach(function (t) { parts.push(t); });
+  (recipe.shop || []).forEach(function (i) { parts.push(i); });
+  return normTag(parts.join(" "));
+}
+
+function recipeHasTaste(recipe, tasteId) {
+  var keywords = TASTE_KEYWORDS[tasteId] || [tasteId];
+  var text = recipeText(recipe);
+  for (var i = 0; i < keywords.length; i++) {
+    if (text.indexOf(normTag(keywords[i])) !== -1) return true;
+  }
+  return false;
+}
+
+/** Só sugere receitas alinhadas aos gostos marcados — sem camarão se não marcou, etc. */
+function recipeMatchesProfile(recipe, meal) {
+  var tastes = profile.tastes[meal] || [];
+  if (!tastes.length) return false;
+
+  var i;
+  for (i = 0; i < STRICT_TASTES.length; i++) {
+    var strictId = STRICT_TASTES[i];
+    if (recipeHasTaste(recipe, strictId) && tastes.indexOf(strictId) === -1) {
+      return false;
+    }
+  }
+
+  for (i = 0; i < tastes.length; i++) {
+    if (recipeHasTaste(recipe, tastes[i])) return true;
+  }
+
+  return false;
+}
+
 function scoreRecipe(recipe, meal) {
   if (recipe.meals.indexOf(meal) === -1) return 0;
 
@@ -77,7 +113,9 @@ function scoreRecipe(recipe, meal) {
 }
 
 function getScoredPool(meal) {
-  return RECIPES.filter(function (r) { return r.meals.indexOf(meal) !== -1; })
+  return RECIPES.filter(function (r) {
+    return r.meals.indexOf(meal) !== -1 && recipeMatchesProfile(r, meal);
+  })
     .map(function (r) { return { recipe: r, score: scoreRecipe(r, meal) }; })
     .sort(function (a, b) {
       if (b.score !== a.score) return b.score - a.score;
@@ -267,6 +305,15 @@ function showRecipeDetail(recipe) {
   recipeEls.detailOrigin.textContent = recipe.origin + " · " + recipe.time + " · " + recipe.level;
   recipeEls.detailDesc.textContent = recipe.desc;
 
+  var sourceEl = recipeEls.detailSource;
+  if (recipe.sourceUrl) {
+    sourceEl.hidden = false;
+    sourceEl.innerHTML = 'Fonte: <a href="' + recipe.sourceUrl + '" target="_blank" rel="noopener noreferrer">TudoGostoso</a>';
+  } else {
+    sourceEl.hidden = true;
+    sourceEl.textContent = "";
+  }
+
   recipeEls.detailSteps.innerHTML = "";
   recipe.steps.forEach(function (step, i) {
     var li = document.createElement("li");
@@ -346,6 +393,7 @@ function initReceitas() {
     detailTitle: document.getElementById("detailTitle"),
     detailOrigin: document.getElementById("detailOrigin"),
     detailDesc: document.getElementById("detailDesc"),
+    detailSource: document.getElementById("detailSource"),
     detailSteps: document.getElementById("detailSteps"),
     detailShop: document.getElementById("detailShop"),
     profileBanner: document.getElementById("profileBanner"),
@@ -383,6 +431,7 @@ function initReceitas() {
     }
     profile.setupDone = true;
     saveProfile(profile);
+    recentlyShown = { cafe: [], almoco: [], janta: [] };
     showToast("Perfil salvo! Agora explore as receitas.");
     switchTab("receitas");
   });

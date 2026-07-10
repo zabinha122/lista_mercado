@@ -32,6 +32,18 @@ python3 -m http.server 8080
 
 Acesse `http://localhost:8080`.
 
+## Receitas (TudoGostoso)
+
+As receitas vêm do [TudoGostoso](https://www.tudogostoso.com.br), com imagens e ingredientes reais. Cada receita exibe o link da fonte.
+
+O app **só sugere receitas compatíveis com os gostos marcados no perfil** — se você não marcou camarão, pratos com camarão não aparecem.
+
+Para atualizar o catálogo localmente:
+
+```bash
+python3 scripts/scrape_tudogostoso.py
+```
+
 ## Publicação (GitHub Pages)
 
 A cada push na `main`, o workflow publica os arquivos na branch `gh-pages`.
