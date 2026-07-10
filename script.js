@@ -285,13 +285,8 @@ function updateStats() {
   els.statTotal.textContent = `${total} ${total === 1 ? "item" : "itens"}`;
   els.statDone.textContent = `${done} marcado${done !== 1 ? "s" : ""}`;
 
-  const hasPricedItems = list.items.some((i) => !i.fromRecipe && !i.checked);
-  if (hasPricedItems) {
-    els.listTotals.hidden = false;
-    els.listTotalValue.textContent = formatBRL(totalPrice);
-  } else {
-    els.listTotals.hidden = true;
-  }
+  els.listTotals.hidden = false;
+  els.listTotalValue.textContent = formatBRL(totalPrice);
 }
 
 function renderListSelect() {
