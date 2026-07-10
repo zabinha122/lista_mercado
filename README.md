@@ -32,6 +32,12 @@ python3 -m http.server 8080
 
 Acesse `http://localhost:8080`.
 
-## Publicação
+## Publicação (GitHub Pages)
 
 O deploy é automático via GitHub Actions ao fazer push na branch `main`.
+
+**Ativação única (obrigatória):** no repositório, vá em **Settings → Pages → Build and deployment → Source** e selecione **GitHub Actions**. Depois disso, cada push na `main` publica o site automaticamente.
+
+**URL do site:** [https://zabinha122.github.io/lista_mercado/](https://zabinha122.github.io/lista_mercado/)
+
+> Alternativa: em **Settings → Pages**, escolha **Deploy from a branch**, branch `main` e pasta `/ (root)` — funciona sem Actions.
