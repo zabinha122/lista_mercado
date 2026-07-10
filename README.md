@@ -34,10 +34,15 @@ Acesse `http://localhost:8080`.
 
 ## Publicação (GitHub Pages)
 
-O deploy é automático via GitHub Actions ao fazer push na branch `main`.
+A cada push na `main`, o workflow publica os arquivos na branch `gh-pages`.
 
-**Ativação única (obrigatória):** no repositório, vá em **Settings → Pages → Build and deployment → Source** e selecione **GitHub Actions**. Depois disso, cada push na `main` publica o site automaticamente.
+### Configuração no GitHub (obrigatória)
+
+1. Abra **Settings → Pages**
+2. Em **Build and deployment → Source**, escolha **Deploy from a branch**
+3. Branch: **`gh-pages`** · Pasta: **`/ (root)`**
+4. Salve e aguarde 1–2 minutos
 
 **URL do site:** [https://zabinha122.github.io/lista_mercado/](https://zabinha122.github.io/lista_mercado/)
 
-> Alternativa: em **Settings → Pages**, escolha **Deploy from a branch**, branch `main` e pasta `/ (root)` — funciona sem Actions.
+> Se estiver em **GitHub Actions**, troque para **Deploy from a branch** — o deploy via Actions neste repositório não está vinculado corretamente e retorna erro 404.
