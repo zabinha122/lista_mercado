@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Bing</title>
+  <style>
+    html, body { margin: 0; height: 100%; font-family: "Segoe UI", Tahoma, sans-serif; }
+    body {
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(255,255,255,.45), transparent 50%),
+        linear-gradient(180deg, #4fb3e8 0%, #7ec8f5 35%, #c8ecff 70%, #e8f7e0 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .logo { font-size: 64px; font-weight: 700; color: #fff; letter-spacing: -2px;
+      text-shadow: 0 4px 18px rgba(0,60,120,.35); margin-bottom: 18px; }
+    .logo span:nth-child(1) { color: #ffb900; }
+    .logo span:nth-child(2) { color: #83b81a; }
+    .logo span:nth-child(3) { color: #f25022; }
+    .logo span:nth-child(4) { color: #00a4ef; }
+    form {
+      display: flex; width: min(520px, 90%);
+      background: #fff; border-radius: 4px; overflow: hidden;
+      box-shadow: 0 8px 28px rgba(0,40,80,.25);
+    }
+    input { flex: 1; border: 0; padding: 12px 14px; font-size: 16px; outline: none; }
+    button {
+      border: 0; background: linear-gradient(180deg, #5eb1ff, #0b76d1);
+      color: #fff; padding: 0 22px; font-weight: 600; cursor: pointer;
+    }
+    .links { margin-top: 22px; color: #0d47a1; font-size: 13px; }
+    .links a { color: inherit; margin: 0 8px; }
+    .bubble {
+      position: absolute; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(180,230,255,.25));
+      border: 1px solid rgba(255,255,255,.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="bubble" style="width:90px;height:90px;left:8%;top:18%"></div>
+  <div class="bubble" style="width:46px;height:46px;right:12%;top:28%"></div>
+  <div class="bubble" style="width:70px;height:70px;right:22%;bottom:18%"></div>
+  <div class="logo"><span>B</span><span>i</span><span>n</span><span>g</span></div>
+  <form action="https://www.bing.com/search" target="_top">
+    <input name="q" placeholder="Pesquisar na web" autofocus>
+    <button type="submit">Pesquisar</button>
+  </form>
+  <p class="links">
+    <a href="../index.html" target="_top">ListaMercado</a>
+    · Imagens · Notícias · Mapas
+  </p>
+</body>
+</html>
