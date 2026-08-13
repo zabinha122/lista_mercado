@@ -42,6 +42,12 @@ Para atualizar preços:
 python3 scripts/scrape_prices.py
 ```
 
+## Windows 7 Aero
+
+Simulação do desktop Windows 7 (tema Aero / Frutiger Aero):
+
+**https://zabinha122.github.io/lista_mercado/windows7/**
+
 ## Receitas (TudoGostoso)
 
 As receitas vêm do [TudoGostoso](https://www.tudogostoso.com.br), com imagens e ingredientes reais. Cada receita exibe o link da fonte.

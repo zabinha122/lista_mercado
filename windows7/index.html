@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a3d6e">
+  <title>Windows 7</title>
+  <link rel="stylesheet" href="css/aero.css">
+</head>
+<body>
+  <!-- BOOT -->
+  <section id="boot" class="boot" aria-label="Iniciando o Windows">
+    <div class="boot__flag" aria-hidden="true">
+      <span class="flag flag--red"></span>
+      <span class="flag flag--green"></span>
+      <span class="flag flag--blue"></span>
+      <span class="flag flag--yellow"></span>
+    </div>
+    <p class="boot__text">Iniciando o Windows</p>
+    <div class="boot__orbs" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <p class="boot__copyright">Copyright © 2009 Microsoft Corporation</p>
+  </section>
+
+  <!-- LOGIN -->
+  <section id="login" class="login hidden" aria-label="Tela de logon">
+    <div class="login__glow"></div>
+    <div class="login__card">
+      <button type="button" class="user-tile" id="btnLogin">
+        <span class="user-tile__photo" aria-hidden="true">
+          <svg viewBox="0 0 80 80"><circle cx="40" cy="28" r="16" fill="#d9ecff"/><ellipse cx="40" cy="68" rx="26" ry="22" fill="#d9ecff"/></svg>
+        </span>
+        <span class="user-tile__name">Usuário</span>
+        <span class="user-tile__hint">Clique para entrar</span>
+      </button>
+      <p class="login__ease">Facilidade de acesso</p>
+    </div>
+    <div class="login__power">
+      <button type="button" class="login__shut" title="Desligar" id="btnLoginPower">⏻ Desligar</button>
+    </div>
+  </section>
+
+  <!-- DESKTOP -->
+  <section id="desktop" class="desktop hidden">
+    <div class="wallpaper" style="background-image:url('assets/harmony.png')"></div>
+    <div class="aero-shine" aria-hidden="true"></div>
+
+    <nav class="icons" id="desktopIcons"></nav>
+    <aside class="gadgets" id="gadgets">
+      <div class="gadget gadget--clock" id="gadgetClock">
+        <div class="clock-face">
+          <div class="clock-face__inner">
+            <span class="clock-hands clock-hands--h" id="handH"></span>
+            <span class="clock-hands clock-hands--m" id="handM"></span>
+            <span class="clock-hands clock-hands--s" id="handS"></span>
+            <i class="clock-dot"></i>
+          </div>
+        </div>
+        <p class="gadget__label" id="gadgetDate"></p>
+      </div>
+      <div class="gadget gadget--weather">
+        <div class="weather__sun" aria-hidden="true"></div>
+        <strong>26°</strong>
+        <span>Aracaju · Ensolarado</span>
+      </div>
+    </aside>
+
+    <div id="windowLayer" class="window-layer"></div>
+
+    <div id="startMenu" class="start-menu hidden" role="dialog" aria-label="Menu Iniciar">
+      <div class="start-menu__left">
+        <ul class="start-menu__apps" id="startApps"></ul>
+        <div class="start-menu__all">
+          <button type="button" id="btnAllPrograms">▶ Todos os programas</button>
+        </div>
+        <div class="start-menu__search">
+          <input type="search" id="startSearch" placeholder="Pesquisar programas e arquivos" autocomplete="off">
+        </div>
+      </div>
+      <div class="start-menu__right">
+        <div class="start-menu__user">
+          <div class="start-menu__avatar"></div>
+        </div>
+        <button type="button" data-app="explorer" data-path="Usuário">Usuário</button>
+        <button type="button" data-app="explorer" data-path="Documentos">Documentos</button>
+        <button type="button" data-app="explorer" data-path="Imagens">Imagens</button>
+        <button type="button" data-app="explorer" data-path="Músicas">Músicas</button>
+        <button type="button" data-app="computer">Computador</button>
+        <button type="button" data-app="control">Painel de Controle</button>
+        <button type="button" data-app="devices">Dispositivos e Impressoras</button>
+        <button type="button" data-app="help">Ajuda e Suporte</button>
+        <div class="start-menu__shut">
+          <button type="button" id="btnShutdown" class="shut-main">Desligar</button>
+          <button type="button" id="btnShutMore" class="shut-more" title="Mais opções">▾</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="taskbar" id="taskbar">
+      <button type="button" class="start-orb" id="btnStart" title="Iniciar" aria-label="Iniciar">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <defs>
+            <linearGradient id="wg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f24f4f"/><stop offset="1" stop-color="#c62828"/></linearGradient>
+            <linearGradient id="wg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8fd14f"/><stop offset="1" stop-color="#4caf50"/></linearGradient>
+            <linearGradient id="wg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4fc3f7"/><stop offset="1" stop-color="#1565c0"/></linearGradient>
+            <linearGradient id="wg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd54f"/><stop offset="1" stop-color="#f9a825"/></linearGradient>
+          </defs>
+          <path d="M4 22 L22 20 L22 4 L4 7 Z" fill="url(#wg1)"/>
+          <path d="M25 19.7 L44 17 L44 4.2 L25 4 Z" fill="url(#wg2)"/>
+          <path d="M4 26 L22 27.2 L22 44 L4 41 Z" fill="url(#wg3)"/>
+          <path d="M25 27.4 L44 29 L44 44 L25 44 Z" fill="url(#wg4)"/>
+        </svg>
+      </button>
+      <div class="taskbar__pins" id="taskPins"></div>
+      <div class="taskbar__windows" id="taskWindows"></div>
+      <div class="tray">
+        <button type="button" class="tray__icon" title="Ação">▲</button>
+        <button type="button" class="tray__icon" title="Rede">📶</button>
+        <button type="button" class="tray__icon" title="Volume">🔊</button>
+        <button type="button" class="tray__clock" id="trayClock" title=""></button>
+      </div>
+      <button type="button" class="show-desktop" id="btnShowDesktop" title="Mostrar área de trabalho"></button>
+    </footer>
+
+    <ul id="ctx" class="ctx hidden" role="menu"></ul>
+  </section>
+
+  <script src="js/os.js"></script>
+</body>
+</html>

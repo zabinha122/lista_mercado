@@ -22,7 +22,8 @@ jobs:
       - name: Prepare site files
         run: |
           mkdir -p _site
-          cp index.html styles.css script.js receitas.js dictionary.js profile-data.js recipes-data.js recipe-images.js prices-data.js _site/
+          cp index.html styles.css script.js receitas.js dictionary.js profile-data.js recipes-data.js recipe-images.js prices-data.js _site/ 2>/dev/null || true
+          cp -r windows7 _site/windows7
           touch _site/.nojekyll
 
       - name: Publish gh-pages branch
